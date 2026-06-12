@@ -63,3 +63,13 @@ Reverse chronological. Short entries, what was covered, what broke, what to revi
 
 ### 2026-06-10
 Repo set up. Going to begin with Domain 4 (IAM) labs.
+
+### 2026-06-12
+
+Did 4.1 today: IAM roles, trust policies, and STS AssumeRole. Started Domain 4 here because every IAM question on this exam eventually collapses into the same question, given an identity policy, a trust policy, an SCP, and a boundary, is this call allowed or not. No point reasoning about that tree until assuming a role is second nature, so I built one out and then broke it on purpose three different ways.
+
+The part that actually rewired something was the contrast. I had lab-user assume the role with zero permissions attached to it and it worked, because the trust policy named the user directly. Then I gave that same user full AdministratorAccess, pointed the trust policy at a different principal, and the assume failed. AccessDenied with admin attached. Reading that in docs does nothing; watching it happen after building both sides myself is what made it stick. The trust policy is the gatekeeper, and identity permissions never punch through it. The middle case is the one I'd have fumbled on the exam before this, when the trust delegates to `:root` instead of naming the user, the account hands the decision back to identity policies, so now you need both sides. That one nuance is the whole "I have AssumeRole but still get denied" versus "I have no perms but can still assume" confusion, and now it's obvious.
+
+Carrying forward: when an assume fails, read the trust policy first, every time. And the permissions boundary trap I want to drill again, since a boundary that leaves out `sts:AssumeRole` caps the user below the line even when trust and identity both allow it. That one's subtle enough that I only half-trust myself on it.
+
+Small on paper, but this is exactly the granular footing I didn't have on attempt three.
