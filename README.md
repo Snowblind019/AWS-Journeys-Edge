@@ -73,3 +73,13 @@ The part that actually rewired something was the contrast. I had lab-user assume
 Carrying forward: when an assume fails, read the trust policy first, every time. And the permissions boundary trap I want to drill again, since a boundary that leaves out `sts:AssumeRole` caps the user below the line even when trust and identity both allow it. That one's subtle enough that I only half-trust myself on it.
 
 Small on paper, but this is exactly the granular footing I didn't have on attempt three.
+
+### 2026-06-17
+
+Did 4.2 today: policy evaluation logic. This is the tree 4.1 was clearing ground for; given an identity policy, a resource policy, a boundary, and an explicit deny, walk the request and decide allowed or not. I didn't want to keep reasoning about it abstractly, so I built one S3 bucket and ran the same two calls against it over and over, changing exactly one statement each time so the policy was the only variable.
+
+The part that actually rewired something was the symmetry, same shape as 4.1 one layer out. I stripped every permission off `lab-user` and the read still worked, because the bucket policy granted it directly — same account, an allow on either side is enough. Then I gave the user `s3:*` and dropped an explicit deny on `GetObject` into the bucket policy, and the read failed while the list kept working. No identity policy but it succeeds, full allow but it's denied. That's the same two-headed confusion as the assume-role one, just moved out a level: "no perms but the call goes through" is a resource policy granting it, "I have an allow but I'm denied" is an explicit deny the allow can't punch through. Watching the same call flip as I moved one line is what made it land — same account is OR, cross account is AND, and an explicit deny wins wherever it actually matches.
+
+Carrying forward: when a call surprises me, gather every policy and look for an explicit deny first, then ask same-account or cross-account before I go hunting for a missing allow. The nuance I only half-trust is scope — my `GetObject` deny never touched `ListBucket` because it was pinned to `bucket/*` and the list runs on the bucket itself, different ARN, different action, so the deny just doesn't reach it. That `/*` versus no-`/*` split reads as a broken policy on the exam when really the deny is landing exactly where it was told to and nowhere else.
+
+Same footing 4.1 gave me, one rung up the tree. The domain is starting to feel like one decision instead of four.
