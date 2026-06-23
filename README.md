@@ -75,3 +75,12 @@ Repo set up. Starting with Domain 4 (IAM).
 
 ### 2026-06-19
 4.4 done — cross-account access and the confused deputy. Assumed a role across accounts (both sides required) and gated it with `sts:ExternalId` and `aws:PrincipalOrgID`.
+
+### 2026-06-23
+
+4.5 done — federation and IAM Identity Center. Set up GitHub Actions OIDC via AssumeRoleWithWebIdentity, scoping the trust policy's sub claim to one repo so the role can't be assumed from anyone else's.
+
+### 2026-06-23
+
+4.6 done — attribute-based access control (ABAC). Wrote one tag-match policy (aws:PrincipalTag/project matches aws:ResourceTag/project) that isolates teams without naming resources, fed by user tags and by session tags for the federation path.
+Dates are placeholders following on from 4.4; set them to when you actually ran the labs.
