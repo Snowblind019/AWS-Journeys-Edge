@@ -62,24 +62,16 @@ Screenshots, if added, have the console account ID cropped out of frame.
 Reverse chronological. Short entries, what was covered, what broke, what to revisit.
 
 ### 2026-06-10
-Repo set up. Going to begin with Domain 4 (IAM) labs.
+Repo set up. Starting with Domain 4 (IAM).
 
 ### 2026-06-12
-
-Did 4.1 today: IAM roles, trust policies, and STS AssumeRole. Started Domain 4 here because every IAM question on this exam eventually collapses into the same question, given an identity policy, a trust policy, an SCP, and a boundary, is this call allowed or not. No point reasoning about that tree until assuming a role is second nature, so I built one out and then broke it on purpose three different ways.
-
-The part that actually rewired something was the contrast. I had lab-user assume the role with zero permissions attached to it and it worked, because the trust policy named the user directly. Then I gave that same user full AdministratorAccess, pointed the trust policy at a different principal, and the assume failed. AccessDenied with admin attached. Reading that in docs does nothing; watching it happen after building both sides myself is what made it stick. The trust policy is the gatekeeper, and identity permissions never punch through it. The middle case is the one I'd have fumbled on the exam before this, when the trust delegates to `:root` instead of naming the user, the account hands the decision back to identity policies, so now you need both sides. That one nuance is the whole "I have AssumeRole but still get denied" versus "I have no perms but can still assume" confusion, and now it's obvious.
-
-Carrying forward: when an assume fails, read the trust policy first, every time. And the permissions boundary trap I want to drill again, since a boundary that leaves out `sts:AssumeRole` caps the user below the line even when trust and identity both allow it. That one's subtle enough that I only half-trust myself on it.
-
-Small on paper, but this is exactly the granular footing I didn't have on attempt three.
+4.1 done — IAM roles, trust policies, STS AssumeRole. Built a role and broke the assume three ways to prove the trust policy, not identity permissions, is the gatekeeper.
 
 ### 2026-06-17
+4.2 done — policy evaluation logic. Ran the same calls against one S3 bucket to walk the identity/resource/boundary/explicit-deny decision tree end to end.
 
-Did 4.2 today: policy evaluation logic. This is the tree 4.1 was clearing ground for; given an identity policy, a resource policy, a boundary, and an explicit deny, walk the request and decide allowed or not. I didn't want to keep reasoning about it abstractly, so I built one S3 bucket and ran the same two calls against it over and over, changing exactly one statement each time so the policy was the only variable.
+### 2026-06-18
+4.3 done — SCPs, RCPs, and Organizations. Stood up a real org and member account to prove SCPs cap above identity and never restrict the management account.
 
-The part that actually rewired something was the symmetry, same shape as 4.1 one layer out. I stripped every permission off `lab-user` and the read still worked, because the bucket policy granted it directly — same account, an allow on either side is enough. Then I gave the user `s3:*` and dropped an explicit deny on `GetObject` into the bucket policy, and the read failed while the list kept working. No identity policy but it succeeds, full allow but it's denied. That's the same two-headed confusion as the assume-role one, just moved out a level: "no perms but the call goes through" is a resource policy granting it, "I have an allow but I'm denied" is an explicit deny the allow can't punch through. Watching the same call flip as I moved one line is what made it land, same account is OR, cross account is AND, and an explicit deny wins wherever it actually matches.
-
-Carrying forward: when a call surprises me, gather every policy and look for an explicit deny first, then ask same-account or cross-account before I go hunting for a missing allow. The nuance I only half-trust is scope — my `GetObject` deny never touched `ListBucket` because it was pinned to `bucket/*` and the list runs on the bucket itself, different ARN, different action, so the deny just doesn't reach it. That `/*` versus no-`/*` split reads as a broken policy on the exam when really the deny is landing exactly where it was told to and nowhere else.
-
-Same footing 4.1 gave me, one rung up the tree. The domain is starting to feel like one decision instead of four.
+### 2026-06-19
+4.4 done — cross-account access and the confused deputy. Assumed a role across accounts (both sides required) and gated it with `sts:ExternalId` and `aws:PrincipalOrgID`.
