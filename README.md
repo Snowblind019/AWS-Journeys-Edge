@@ -87,3 +87,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-23
 
 5.1 done — KMS key policies vs IAM policies. Rewrote one key's policy three ways to prove the key policy is primary: :root delegates to IAM, dropping it kills an unchanged IAM allow, and naming a principal directly grants access with no IAM policy at all.
+
+### 2026-06-24
+
+5.2 done — cross-account KMS and encryption context. Proved cross-account needs both the key policy and the caller's IAM (the opposite of 5.1's key-policy-only), and that encryption context binds to the ciphertext as AAD so decrypt requires the exact same context and can be scoped by condition.
