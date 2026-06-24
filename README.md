@@ -83,4 +83,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-23
 
 4.6 done — attribute-based access control (ABAC). Wrote one tag-match policy (aws:PrincipalTag/project matches aws:ResourceTag/project) that isolates teams without naming resources, fed by user tags and by session tags for the federation path.
-Dates are placeholders following on from 4.4; set them to when you actually ran the labs.
+
+### 2026-06-23
+
+5.1 done — KMS key policies vs IAM policies. Rewrote one key's policy three ways to prove the key policy is primary: :root delegates to IAM, dropping it kills an unchanged IAM allow, and naming a principal directly grants access with no IAM policy at all.
