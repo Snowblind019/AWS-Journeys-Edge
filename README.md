@@ -91,3 +91,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-24
 
 5.2 done — cross-account KMS and encryption context. Proved cross-account needs both the key policy and the caller's IAM (the opposite of 5.1's key-policy-only), and that encryption context binds to the ciphertext as AAD so decrypt requires the exact same context and can be scoped by condition.
+
+### 2026-06-25
+
+5.3 done — envelope encryption. Hit the 4 KB CMK wall, then used GenerateDataKey to encrypt a big file locally and recover it, proving the CMK only ever wraps the data key while the bulk AES happens off-KMS.
