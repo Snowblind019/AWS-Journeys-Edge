@@ -38,7 +38,7 @@ Each domain folder holds one markdown file per subdomain, plus a short README li
 
 SCS-C03 has six scored domains, listed here by exam weight.
 
-- [ ] **04 — Identity and Access Management** (20%)
+- [x] **04 — Identity and Access Management** (20%)
 - [ ] **03 — Infrastructure Security** (18%)
 - [ ] **05 — Data Protection** (18%) — in progress (KMS)
 - [ ] **01 — Detection** (16%)
@@ -95,3 +95,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-25
 
 5.3 done — envelope encryption. Hit the 4 KB CMK wall, then used GenerateDataKey to encrypt a big file locally and recover it, proving the CMK only ever wraps the data key while the bulk AES happens off-KMS.
+
+### 2026-06-26
+
+5.4 done — S3 encryption at rest and in transit. Confirmed SSE-S3 is the automatic baseline and SSE-KMS adds the audited CMK path, then forced KMS-only uploads with a bucket policy (an absent encryption header counts as not aws:kms, since the deny runs before S3's default applies) and required TLS via an aws:SecureTransport deny.
