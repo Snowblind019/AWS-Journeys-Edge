@@ -96,6 +96,10 @@ Repo set up. Starting with Domain 4 (IAM).
 
 5.3 done — envelope encryption. Hit the 4 KB CMK wall, then used GenerateDataKey to encrypt a big file locally and recover it, proving the CMK only ever wraps the data key while the bulk AES happens off-KMS.
 
-### 2026-06-26
+### 2026-06-25
 
 5.4 done — S3 encryption at rest and in transit. Confirmed SSE-S3 is the automatic baseline and SSE-KMS adds the audited CMK path, then forced KMS-only uploads with a bucket policy (an absent encryption header counts as not aws:kms, since the deny runs before S3's default applies) and required TLS via an aws:SecureTransport deny.
+
+### 2026-06-25
+
+5.5 done — Secrets Manager vs Parameter Store. Stored a CMK-encrypted secret and the SecureString equivalent, walked the four-step rotation contract and version stages, and proved a cross-account secret read takes three grants: the secret resource policy, the caller's GetSecretValue IAM, and kms:Decrypt on a customer-managed CMK.
