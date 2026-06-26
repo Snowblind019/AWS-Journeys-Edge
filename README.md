@@ -40,7 +40,7 @@ SCS-C03 has six scored domains, listed here by exam weight.
 
 - [x] **04 — Identity and Access Management** (20%)
 - [ ] **03 — Infrastructure Security** (18%)
-- [ ] **05 — Data Protection** (18%) — in progress (KMS)
+- [x] **05 — Data Protection** (18%) — in progress (KMS)
 - [ ] **01 — Detection** (16%)
 - [ ] **02 — Incident Response** (14%)
 - [ ] **06 — Security Foundations and Governance** (14%)
@@ -103,3 +103,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-25
 
 5.5 done — Secrets Manager vs Parameter Store. Stored a CMK-encrypted secret and the SecureString equivalent, walked the four-step rotation contract and version stages, and proved a cross-account secret read takes three grants: the secret resource policy, the caller's GetSecretValue IAM, and kms:Decrypt on a customer-managed CMK.
+
+### 2026-06-26
+
+5.6 done — Macie, ACM, and in-transit enforcement. Covered Macie classification (S3-only, sampled automated vs full targeted discovery), the ACM cert lifecycle (public vs Private CA, DNS validation, us-east-1 for CloudFront, imported certs don't auto-renew), and the per-service points that force TLS rather than just allow it.
