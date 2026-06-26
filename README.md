@@ -111,3 +111,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-26
 
 5.7 done — KMS rotation, BYOK, and multi-Region keys. Proved rotation is transparent and non-destructive but does nothing for a leaked data key, imported my own EXTERNAL key material, replicated a multi-Region key, and slotted CloudHSM and XKS on the spectrum from AWS-managed to never-in-AWS.
+
+### 2026-06-26
+
+5.8 done — S3 Object Lock, legal hold, MFA Delete, and checksums. Proved governance retention has an admin bypass while compliance can't be overridden by anyone (not even root) or shortened, legal hold blocks deletion with no end date, and checksums verify integrity where ETag can't.
