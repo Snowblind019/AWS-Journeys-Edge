@@ -107,3 +107,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-26
 
 5.6 done — Macie, ACM, and in-transit enforcement. Covered Macie classification (S3-only, sampled automated vs full targeted discovery), the ACM cert lifecycle (public vs Private CA, DNS validation, us-east-1 for CloudFront, imported certs don't auto-renew), and the per-service points that force TLS rather than just allow it.
+
+### 2026-06-26
+
+5.7 done — KMS rotation, BYOK, and multi-Region keys. Proved rotation is transparent and non-destructive but does nothing for a leaked data key, imported my own EXTERNAL key material, replicated a multi-Region key, and slotted CloudHSM and XKS on the spectrum from AWS-managed to never-in-AWS.
