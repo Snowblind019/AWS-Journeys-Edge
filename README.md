@@ -115,3 +115,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-06-26
 
 5.8 done — S3 Object Lock, legal hold, MFA Delete, and checksums. Proved governance retention has an admin bypass while compliance can't be overridden by anyone (not even root) or shortened, legal hold blocks deletion with no end date, and checksums verify integrity where ETag can't.
+
+### 2026-07-01
+
+3.1 done — VPC security groups vs NACLs (stateful vs stateless). Removed outbound from each layer and watched opposite results: dropping the NACL's ephemeral outbound rule broke the SSH return packet, while stripping the SG's egress didn't, since the SG auto-allows the reply to an inbound connection it already permitted.
