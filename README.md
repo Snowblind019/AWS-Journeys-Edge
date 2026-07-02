@@ -39,7 +39,7 @@ Each domain folder holds one markdown file per subdomain, plus a short README li
 SCS-C03 has six scored domains, listed here by exam weight.
 
 - [x] **04 — Identity and Access Management** (20%)
-- [ ] **03 — Infrastructure Security** (18%)
+- [x] **03 — Infrastructure Security** (18%)
 - [x] **05 — Data Protection** (18%) — in progress (KMS)
 - [ ] **01 — Detection** (16%)
 - [ ] **02 — Incident Response** (14%)
@@ -142,3 +142,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.7 done — hybrid connectivity encryption (MACsec, IPsec over DX, VPN). Started from the wrong assumption that Direct Connect is encrypted (it is private, not encrypted), then compared MACsec at L2 (near line rate, dedicated-only, link not journey) against IPsec VPN over DX at L3 (end-to-end, ~1.25 Gbps per tunnel), with VPN over the internet as the encrypted DX failover.
+
+### 2026-07-02
+
+3.8 done — DNSSEC and load balancer TLS posture. Signed a hosted zone with a KSK backed by an asymmetric ECC_NIST_P256 KMS key (signing does nothing until the DS record lands at the parent, and KMS key loss means SERVFAIL), then set a TLS 1.3 listener policy and configured ALB mTLS verify against passthrough, noting NLB has no LB-managed mTLS.
