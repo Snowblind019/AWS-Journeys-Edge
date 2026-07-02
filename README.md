@@ -130,3 +130,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.4 done — CloudFront private origin, WAF, and Shield. Locked S3 to one distribution with OAC (SigV4 plus AWS:SourceArn, after showing a public bucket and legacy OAI both fall short), added a WAF web ACL (managed, rate-based, and geo rules) in us-east-1, and placed Shield Standard against Advanced.
+
+### 2026-07-02
+
+3.5 done — IMDSv2 and SSM management. Reproduced the IMDSv1 SSRF that leaks role credentials on an unauthenticated GET, closed it by requiring IMDSv2 (PUT-for-token plus a low hop limit) and stacking real enforcement since an account default isn't enforcement, then swapped the SSH bastion for Session Manager: zero inbound ports, IAM-authenticated, fully logged.
