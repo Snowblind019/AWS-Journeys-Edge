@@ -123,3 +123,6 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.2 done — VPC endpoints (gateway vs interface). Swapped a NAT-to-public-S3 path for a free S3 gateway endpoint, then pinned the bucket to the VPC with two locks (an endpoint policy plus a bucket policy on aws:sourceVpce), and contrasted with an interface endpoint (ENI with a private IP, SG on 443, private DNS) for Secrets Manager.
+
+### 2026-07-03
+3.3 done — VPC connectivity (IGW/NAT, peering, Transit Gateway). Proved a subnet is public only via an IGW route and that NAT is outbound-only, that peering is non-transitive (A can't reach C through B), and that a Transit Gateway is the transitive hub replacing the n(n-1)/2 peering mesh.
