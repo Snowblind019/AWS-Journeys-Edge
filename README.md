@@ -119,3 +119,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-01
 
 3.1 done — VPC security groups vs NACLs (stateful vs stateless). Removed outbound from each layer and watched opposite results: dropping the NACL's ephemeral outbound rule broke the SSH return packet, while stripping the SG's egress didn't, since the SG auto-allows the reply to an inbound connection it already permitted.
+
+### 2026-07-02
+
+3.2 done — VPC endpoints (gateway vs interface). Swapped a NAT-to-public-S3 path for a free S3 gateway endpoint, then pinned the bucket to the VPC with two locks (an endpoint policy plus a bucket policy on aws:sourceVpce), and contrasted with an interface endpoint (ENI with a private IP, SG on 443, private DNS) for Secrets Manager.
