@@ -134,3 +134,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.5 done — IMDSv2 and SSM management. Reproduced the IMDSv1 SSRF that leaks role credentials on an unauthenticated GET, closed it by requiring IMDSv2 (PUT-for-token plus a low hop limit) and stacking real enforcement since an account default isn't enforcement, then swapped the SSH bastion for Session Manager: zero inbound ports, IAM-authenticated, fully logged.
+
+### 2026-07-02
+
+3.6 done — DNS Firewall, Network Firewall, and Gateway Load Balancer. Built a Route 53 DNS Firewall block rule (bad domain returns NXDOMAIN on the resolver path) and mapped the inspection tiers: Network Firewall as the AWS-managed L3-L7 backstop for what bypasses DNS, and GWLB for inserting a third-party vendor appliance inline via GENEVE.
