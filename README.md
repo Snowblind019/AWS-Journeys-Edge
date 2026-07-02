@@ -138,3 +138,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.6 done — DNS Firewall, Network Firewall, and Gateway Load Balancer. Built a Route 53 DNS Firewall block rule (bad domain returns NXDOMAIN on the resolver path) and mapped the inspection tiers: Network Firewall as the AWS-managed L3-L7 backstop for what bypasses DNS, and GWLB for inserting a third-party vendor appliance inline via GENEVE.
+
+### 2026-07-02
+
+3.7 done — hybrid connectivity encryption (MACsec, IPsec over DX, VPN). Started from the wrong assumption that Direct Connect is encrypted (it is private, not encrypted), then compared MACsec at L2 (near line rate, dedicated-only, link not journey) against IPsec VPN over DX at L3 (end-to-end, ~1.25 Gbps per tunnel), with VPN over the internet as the encrypted DX failover.
