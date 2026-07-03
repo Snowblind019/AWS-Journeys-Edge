@@ -151,6 +151,10 @@ Repo set up. Starting with Domain 4 (IAM).
 
 1.1 done — CloudTrail. Built the bucket policy CloudTrail requires (ACL check plus write, with bucket-owner-full-control for cross-account and aws:SourceArn as the confused-deputy guard), created a multi-region trail with log file validation, proved data events are off by default until you add a selector, then validated the digest chain and watched it flag a deleted log object.
 
-### 2026-07-10
+### 2026-07-03
 
 1.2 done — GuardDuty. Enabled a detector and generated sample findings with no flow logs or trail present, proving GuardDuty consumes its inputs independently, then set the invertible trusted (suppress) versus threat (alert) IP lists, a suppression rule that archives without deleting, org-wide auto-enable, and drilled the GuardDuty vs Macie/Inspector/Config/Detective discriminators.
+
+### 2026-07-03
+
+1.3 done — Security Hub. Enabled CSPM with default standards while Config wasn't recording and watched controls go NOT_AVAILABLE (a wrong score is a Config problem first), then turned on the recorder to fix it, and drilled the tested distinctions: disable vs suppress, automation rules (act inside on the finding) vs EventBridge (act outside), ASFF ingest, the cross-region aggregator, and org-wide central configuration.
