@@ -146,3 +146,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-02
 
 3.8 done — DNSSEC and load balancer TLS posture. Signed a hosted zone with a KSK backed by an asymmetric ECC_NIST_P256 KMS key (signing does nothing until the DS record lands at the parent, and KMS key loss means SERVFAIL), then set a TLS 1.3 listener policy and configured ALB mTLS verify against passthrough, noting NLB has no LB-managed mTLS.
+
+### 2026-07-03
+
+1.1 done — CloudTrail. Built the bucket policy CloudTrail requires (ACL check plus write, with bucket-owner-full-control for cross-account and aws:SourceArn as the confused-deputy guard), created a multi-region trail with log file validation, proved data events are off by default until you add a selector, then validated the digest chain and watched it flag a deleted log object.
