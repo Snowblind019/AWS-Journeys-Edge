@@ -150,3 +150,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-03
 
 1.1 done — CloudTrail. Built the bucket policy CloudTrail requires (ACL check plus write, with bucket-owner-full-control for cross-account and aws:SourceArn as the confused-deputy guard), created a multi-region trail with log file validation, proved data events are off by default until you add a selector, then validated the digest chain and watched it flag a deleted log object.
+
+### 2026-07-10
+
+1.2 done — GuardDuty. Enabled a detector and generated sample findings with no flow logs or trail present, proving GuardDuty consumes its inputs independently, then set the invertible trusted (suppress) versus threat (alert) IP lists, a suppression rule that archives without deleting, org-wide auto-enable, and drilled the GuardDuty vs Macie/Inspector/Config/Detective discriminators.
