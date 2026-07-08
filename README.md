@@ -158,3 +158,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-03
 
 1.3 done — Security Hub. Enabled CSPM with default standards while Config wasn't recording and watched controls go NOT_AVAILABLE (a wrong score is a Config problem first), then turned on the recorder to fix it, and drilled the tested distinctions: disable vs suppress, automation rules (act inside on the finding) vs EventBridge (act outside), ASFF ingest, the cross-region aggregator, and org-wide central configuration.
+
+### 2026-07-08
+
+1.4 done — AWS Config. Turned on the recorder for all supported plus global types (the foundation that fed Security Hub in 1.3), added a change-triggered managed rule that flipped a 0.0.0.0/0 SSH group to NON_COMPLIANT, then broke auto-remediation with an under-permissioned AutomationAssumeRole before fixing it, and drilled managed vs custom, change-triggered vs periodic, org conformance packs, and the aggregator as visibility not enforcement.
