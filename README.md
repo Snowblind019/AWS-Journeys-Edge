@@ -162,3 +162,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-08
 
 1.4 done — AWS Config. Turned on the recorder for all supported plus global types (the foundation that fed Security Hub in 1.3), added a change-triggered managed rule that flipped a 0.0.0.0/0 SSH group to NON_COMPLIANT, then broke auto-remediation with an under-permissioned AutomationAssumeRole before fixing it, and drilled managed vs custom, change-triggered vs periodic, org conformance packs, and the aggregator as visibility not enforcement.
+
+### 2026-07-08
+
+1.5 done — CloudWatch Logs. Wired CloudTrail into CloudWatch Logs (a separate path from the S3 copy), built a root-usage metric filter and alarm (notify), contrasted it with Logs Insights (investigate) and a subscription filter (forward events to a SIEM), then applied a data protection policy that masks PII at ingest, revealed only with logs:Unmask.
