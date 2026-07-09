@@ -170,3 +170,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-14
 
 1.6 done — Security Lake. Enabled the lake with a VPC Flow source normalized to OCSF, queried the tables with Athena (partitioned on time to control cost), and drilled the right-tool decisions: query vs data access subscribers, Athena (one-off) vs OpenSearch (frequent, low-latency), Security Lake vs a plain org trail, and OCSF vs ASFF.
+
+### 2026-07-15
+
+1.7 done — service logging failure modes and Macie. Worked the silent-failure cause per service (API Gateway account-level role, Lambda execution role, CloudFront latency, Route 53 us-east-1 and resource policy, Flow Logs delivery role plus the DNS and metadata coverage blind spot), then revisited Macie as the at-rest PII detector that pairs with 1.5's in-transit masking, breadth via automated discovery against depth via jobs.
