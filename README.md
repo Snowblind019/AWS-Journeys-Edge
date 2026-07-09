@@ -41,7 +41,7 @@ SCS-C03 has six scored domains, listed here by exam weight.
 - [x] **04 — Identity and Access Management** (20%)
 - [x] **03 — Infrastructure Security** (18%)
 - [x] **05 — Data Protection** (18%) — in progress (KMS)
-- [ ] **01 — Detection** (16%)
+- [x] **01 — Detection** (16%)
 - [ ] **02 — Incident Response** (14%)
 - [ ] **06 — Security Foundations and Governance** (14%)
 
@@ -167,10 +167,14 @@ Repo set up. Starting with Domain 4 (IAM).
 
 1.5 done — CloudWatch Logs. Wired CloudTrail into CloudWatch Logs (a separate path from the S3 copy), built a root-usage metric filter and alarm (notify), contrasted it with Logs Insights (investigate) and a subscription filter (forward events to a SIEM), then applied a data protection policy that masks PII at ingest, revealed only with logs:Unmask.
 
-### 2026-07-14
+### 2026-07-08
 
 1.6 done — Security Lake. Enabled the lake with a VPC Flow source normalized to OCSF, queried the tables with Athena (partitioned on time to control cost), and drilled the right-tool decisions: query vs data access subscribers, Athena (one-off) vs OpenSearch (frequent, low-latency), Security Lake vs a plain org trail, and OCSF vs ASFF.
 
-### 2026-07-15
+### 2026-07-08
 
 1.7 done — service logging failure modes and Macie. Worked the silent-failure cause per service (API Gateway account-level role, Lambda execution role, CloudFront latency, Route 53 us-east-1 and resource policy, Flow Logs delivery role plus the DNS and metadata coverage blind spot), then revisited Macie as the at-rest PII detector that pairs with 1.5's in-transit masking, breadth via automated discovery against depth via jobs.
+
+### 2026-07-09
+
+2.1 done — EC2 incident response. Built the wrong answers first (terminate destroys RAM and the EBS volume, an SG swap leaves the live SSH session up because SGs are stateful and still allow egress), then contained correctly with an empty SG plus a stateless NACL deny, revoked the role's live creds by aws:TokenIssueTime, and snapshotted for clean-room analysis, with the break-glass role pre-staged.
