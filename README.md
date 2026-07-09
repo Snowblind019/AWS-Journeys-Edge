@@ -166,3 +166,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-08
 
 1.5 done — CloudWatch Logs. Wired CloudTrail into CloudWatch Logs (a separate path from the S3 copy), built a root-usage metric filter and alarm (notify), contrasted it with Logs Insights (investigate) and a subscription filter (forward events to a SIEM), then applied a data protection policy that masks PII at ingest, revealed only with logs:Unmask.
+
+### 2026-07-14
+
+1.6 done — Security Lake. Enabled the lake with a VPC Flow source normalized to OCSF, queried the tables with Athena (partitioned on time to control cost), and drilled the right-tool decisions: query vs data access subscribers, Athena (one-off) vs OpenSearch (frequent, low-latency), Security Lake vs a plain org trail, and OCSF vs ASFF.
