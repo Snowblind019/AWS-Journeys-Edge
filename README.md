@@ -178,3 +178,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-09
 
 2.1 done — EC2 incident response. Built the wrong answers first (terminate destroys RAM and the EBS volume, an SG swap leaves the live SSH session up because SGs are stateful and still allow egress), then contained correctly with an empty SG plus a stateless NACL deny, revoked the role's live creds by aws:TokenIssueTime, and snapshotted for clean-room analysis, with the break-glass role pre-staged.
+
+### 2026-07-10
+
+2.2 done — EC2 forensics. Captured memory first from the running instance via SSM, which meant adding PrivateLink endpoints so 2.1's no-egress isolation didn't block it, then hit the cross-account trap that a default aws/ebs-encrypted snapshot can't be shared, so re-keyed under a CMK and double-copied under a forensic-owned key, mounted read-only, and stored in a COMPLIANCE Object Lock bucket.
