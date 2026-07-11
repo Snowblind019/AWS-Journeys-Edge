@@ -202,3 +202,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-11
 
 2.7 done — compromised root user. Proved root sits above IAM (a deny policy or boundary does nothing, and neither TokenIssueTime nor aws:userid touches it, so containment is credential rotation only), that SCPs reach member-account root but never the management account, then ran the response (reset password, delete keys, reset MFA, hunt persistence and lockout moves) and set up centralized root credentials management so member accounts have no root credentials to steal.
+
+### 2026-07-11
+
+2.8 done — malware and ransomware. EC2 side: confirmed with an agentless on-demand scan (Malware Protection is agentless and not continuous, once per 24h, so it complements AV), then isolate, preserve, rebuild from a golden AMI, and recover from a verified-clean backup since the latest backup may be infected. S3 side: proved encryption is the ransomware weapon not the defense (SSE-C) and that immutability (Object Lock COMPLIANCE) plus versioning and MFA Delete, not replication, make it survivable, revoking credentials before restoring.
