@@ -190,3 +190,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-10
 
 2.4 done — Detective and scoping an investigation. Drove the workflow off a sample GuardDuty finding, built the wrong answers (scoping off one finding, hand-querying Athena, acting on severity alone), then ran the correct path: pivot into Detective, validate the entity against its baseline, follow the finding group to the full multi-stage sequence, pull IoCs and MITRE TTPs, and hand the scoped set to response, since one finding isn't one incident and severity is priority not truth.
+
+### 2026-07-11
+
+2.5 done — automated remediation. Learned the three event paths (GuardDuty Finding, Security Hub Imported for automatic, Custom Action for human-in-the-loop), built the wrong answers (auto-terminate everything is a self-DoS, an automation rule can't touch the resource, one admin Lambda with hardcoded creds), then built the correct pipeline: precise EventBridge match (Sample false, Workflow NEW), an SSM runbook under least privilege, close the loop, and a human gate for destructive actions, and placed ASR as the prebuilt org-wide answer.
