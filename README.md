@@ -186,3 +186,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-10
 
 2.3 done — compromised IAM credentials. Proved AWS's auto-quarantine is damage-limiting not remediation (S3 reads still worked), then ran the real sequence: contain the key, kill live sessions with an explicit deny (aws:userid for user sessions, aws:TokenIssueTime for role sessions, since deactivating AKIA doesn't touch live ASIA), investigate via CloudTrail, hunt persistence, and recover by migrating off long-term keys to roles.
+
+### 2026-07-10
+
+2.4 done — Detective and scoping an investigation. Drove the workflow off a sample GuardDuty finding, built the wrong answers (scoping off one finding, hand-querying Athena, acting on severity alone), then ran the correct path: pivot into Detective, validate the entity against its baseline, follow the finding group to the full multi-stage sequence, pull IoCs and MITRE TTPs, and hand the scoped set to response, since one finding isn't one incident and severity is priority not truth.
