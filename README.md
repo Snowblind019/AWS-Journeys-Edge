@@ -198,3 +198,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-11
 
 2.6 done — validating the IR plan. Framed validation as demonstrated not documented, built the wrong answers (a runbook is paper, FIS in prod with no stop conditions is a sev-1, Resilience Hub doesn't inject faults), then ran the workflow: steady state and hypothesis, sample findings for detection, scoped FIS with stop conditions for the fault side, a GameDay with success criteria, Step Functions to orchestrate, and ARC to prove recovery, keeping the Resilience Hub / FIS / ARC trio straight.
+
+### 2026-07-11
+
+2.7 done — compromised root user. Proved root sits above IAM (a deny policy or boundary does nothing, and neither TokenIssueTime nor aws:userid touches it, so containment is credential rotation only), that SCPs reach member-account root but never the management account, then ran the response (reset password, delete keys, reset MFA, hunt persistence and lockout moves) and set up centralized root credentials management so member accounts have no root credentials to steal.
