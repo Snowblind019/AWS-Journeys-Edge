@@ -194,3 +194,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-11
 
 2.5 done — automated remediation. Learned the three event paths (GuardDuty Finding, Security Hub Imported for automatic, Custom Action for human-in-the-loop), built the wrong answers (auto-terminate everything is a self-DoS, an automation rule can't touch the resource, one admin Lambda with hardcoded creds), then built the correct pipeline: precise EventBridge match (Sample false, Workflow NEW), an SSM runbook under least privilege, close the loop, and a human gate for destructive actions, and placed ASR as the prebuilt org-wide answer.
+
+### 2026-07-11
+
+2.6 done — validating the IR plan. Framed validation as demonstrated not documented, built the wrong answers (a runbook is paper, FIS in prod with no stop conditions is a sev-1, Resilience Hub doesn't inject faults), then ran the workflow: steady state and hypothesis, sample findings for detection, scoped FIS with stop conditions for the fault side, a GameDay with success criteria, Step Functions to orchestrate, and ARC to prove recovery, keeping the Resilience Hub / FIS / ARC trio straight.
