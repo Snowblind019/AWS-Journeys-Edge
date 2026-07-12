@@ -207,10 +207,13 @@ Repo set up. Starting with Domain 4 (IAM).
 
 2.8 done — malware and ransomware. EC2 side: confirmed with an agentless on-demand scan (Malware Protection is agentless and not continuous, once per 24h, so it complements AV), then isolate, preserve, rebuild from a golden AMI, and recover from a verified-clean backup since the latest backup may be infected. S3 side: proved encryption is the ransomware weapon not the defense (SSE-C) and that immutability (Object Lock COMPLIANCE) plus versioning and MFA Delete, not replication, make it survivable, revoking credentials before restoring.
 
-### 2026-07-11
+### 2026-07-12
 
 6.1 done — Organizations policy types beyond SCPs. Proved an RCP is a resource-side upper bound by denying my own GET on a bucket I owned with admin, then built an org-perimeter RCP (and saw why it needs the aws:PrincipalIsAWSService exception or it breaks SLR access), showed why an SCP can't stop an external account a bucket policy grants (direction of control: SCP principal-side, RCP resource-side), and separated declarative policies (durable config baseline) and AI opt-out (content governance, not access) from both.
 
-### 2026-07-11
+### 2026-07-12
 
 6.2 done — centralized root, delegated admin, and break-glass. Enabled centralized root access (and saw the trap that a root-deny SCP silently blocks sts:AssumeRoot), moved root administration to a delegated security account (the same reflex that runs every security service off the management account), deleted a member's root credentials and audited zero, unlocked a deny-all bucket policy through a task-scoped root session that could do nothing else, and designed break-glass for the root-only tasks centralized access can't cover.
+
+### 2026-07-12
+6.3 done — Control Tower. Mapped the two independent axes (behavior: preventive SCP, detective Config, proactive CFN hook; guidance: mandatory, strongly recommended, elective, which never implies behavior), and drilled the traps: proactive controls only see CloudFormation (miss console, CLI, Terraform), preventive controls skip the management account (the 4.3 SCP exemption), the five-SCP-per-OU budget, and Account Factory/AFT vending accounts versus StackSets deploying resources.
