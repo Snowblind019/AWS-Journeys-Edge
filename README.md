@@ -42,7 +42,7 @@ SCS-C03 has six scored domains, listed here by exam weight.
 - [x] **03 — Infrastructure Security** (18%)
 - [x] **05 — Data Protection** (18%) — in progress (KMS)
 - [x] **01 — Detection** (16%)
-- [ ] **02 — Incident Response** (14%)
+- [x] **02 — Incident Response** (14%)
 - [ ] **06 — Security Foundations and Governance** (14%)
 
 Subdomain-level checklists live in each domain folder.
@@ -206,3 +206,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-11
 
 2.8 done — malware and ransomware. EC2 side: confirmed with an agentless on-demand scan (Malware Protection is agentless and not continuous, once per 24h, so it complements AV), then isolate, preserve, rebuild from a golden AMI, and recover from a verified-clean backup since the latest backup may be infected. S3 side: proved encryption is the ransomware weapon not the defense (SSE-C) and that immutability (Object Lock COMPLIANCE) plus versioning and MFA Delete, not replication, make it survivable, revoking credentials before restoring.
+
+### 2026-07-11
+
+6.1 done — Organizations policy types beyond SCPs. Proved an RCP is a resource-side upper bound by denying my own GET on a bucket I owned with admin, then built an org-perimeter RCP (and saw why it needs the aws:PrincipalIsAWSService exception or it breaks SLR access), showed why an SCP can't stop an external account a bucket policy grants (direction of control: SCP principal-side, RCP resource-side), and separated declarative policies (durable config baseline) and AI opt-out (content governance, not access) from both.
