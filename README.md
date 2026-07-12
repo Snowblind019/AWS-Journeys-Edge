@@ -210,3 +210,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-11
 
 6.1 done — Organizations policy types beyond SCPs. Proved an RCP is a resource-side upper bound by denying my own GET on a bucket I owned with admin, then built an org-perimeter RCP (and saw why it needs the aws:PrincipalIsAWSService exception or it breaks SLR access), showed why an SCP can't stop an external account a bucket policy grants (direction of control: SCP principal-side, RCP resource-side), and separated declarative policies (durable config baseline) and AI opt-out (content governance, not access) from both.
+
+### 2026-07-11
+
+6.2 done — centralized root, delegated admin, and break-glass. Enabled centralized root access (and saw the trap that a root-deny SCP silently blocks sts:AssumeRoot), moved root administration to a delegated security account (the same reflex that runs every security service off the management account), deleted a member's root credentials and audited zero, unlocked a deny-all bucket policy through a task-scoped root session that could do nothing else, and designed break-glass for the root-only tasks centralized access can't cover.
