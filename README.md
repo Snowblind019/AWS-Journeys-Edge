@@ -43,7 +43,7 @@ SCS-C03 has six scored domains, listed here by exam weight.
 - [x] **05 — Data Protection** (18%) — in progress (KMS)
 - [x] **01 — Detection** (16%)
 - [x] **02 — Incident Response** (14%)
-- [ ] **06 — Security Foundations and Governance** (14%)
+- [x] **06 — Security Foundations and Governance** (14%)
 
 Subdomain-level checklists live in each domain folder.
 
@@ -230,3 +230,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-14
 
 6.6 done — compliance capstone. Ran the Config detect-and-remediate loop (flagged an unencrypted bucket, auto-fixed it via an SSM document under a remediation role), confirmed Security Hub runs its standards on Config rules and depends on it, and nailed the two exam splits: Config (fix resources) vs Security Hub (score posture on top), and Audit Manager (your evidence, customer side) vs Artifact (AWS's reports, provider side), with the Well-Architected Tool reviewing design not live resources.
+
+### 2026-07-14
+
+6.7 done — tagging strategy. Nailed the headline split (a tag policy governs shape, value and case, but never presence, so requiring a tag at creation is an SCP with a Null condition on aws:RequestTag), drilled the four condition keys (RequestTag vs ResourceTag the most-confused), built ABAC with aws:ResourceTag = aws:PrincipalTag and protected the auth tag via aws:TagKeys, and used cost allocation tags and Resource Groups for cost and one-query incident response, with tags being metadata that's only a control when a policy reads it.
