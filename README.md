@@ -217,3 +217,6 @@ Repo set up. Starting with Domain 4 (IAM).
 
 ### 2026-07-12
 6.3 done — Control Tower. Mapped the two independent axes (behavior: preventive SCP, detective Config, proactive CFN hook; guidance: mandatory, strongly recommended, elective, which never implies behavior), and drilled the traps: proactive controls only see CloudFormation (miss console, CLI, Terraform), preventive controls skip the management account (the 4.3 SCP exemption), the five-SCP-per-OU budget, and Account Factory/AFT vending accounts versus StackSets deploying resources.
+
+### 2026-07-14
+6.4 done — IaC security and StackSets. Ran the two gates (cfn-lint for validity, cfn-guard for security, since a valid template can still be insecure), unit-tested Guard rules and trimmed rulegen scaffolding, bridged to server-side CloudFormation Hooks (a Guard-backed Hook is a proactive control, with the same CloudFormation-only limit as 6.3), and rolled a baseline to an OU with a service-managed auto-deploying StackSet, keeping StackSets (deploy resources) distinct from Account Factory (create accounts).
