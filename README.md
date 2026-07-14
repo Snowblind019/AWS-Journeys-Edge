@@ -216,7 +216,13 @@ Repo set up. Starting with Domain 4 (IAM).
 6.2 done — centralized root, delegated admin, and break-glass. Enabled centralized root access (and saw the trap that a root-deny SCP silently blocks sts:AssumeRoot), moved root administration to a delegated security account (the same reflex that runs every security service off the management account), deleted a member's root credentials and audited zero, unlocked a deny-all bucket policy through a task-scoped root session that could do nothing else, and designed break-glass for the root-only tasks centralized access can't cover.
 
 ### 2026-07-12
+
 6.3 done — Control Tower. Mapped the two independent axes (behavior: preventive SCP, detective Config, proactive CFN hook; guidance: mandatory, strongly recommended, elective, which never implies behavior), and drilled the traps: proactive controls only see CloudFormation (miss console, CLI, Terraform), preventive controls skip the management account (the 4.3 SCP exemption), the five-SCP-per-OU budget, and Account Factory/AFT vending accounts versus StackSets deploying resources.
 
 ### 2026-07-14
+
 6.4 done — IaC security and StackSets. Ran the two gates (cfn-lint for validity, cfn-guard for security, since a valid template can still be insecure), unit-tested Guard rules and trimmed rulegen scaffolding, bridged to server-side CloudFormation Hooks (a Guard-backed Hook is a proactive control, with the same CloudFormation-only limit as 6.3), and rolled a baseline to an OU with a service-managed auto-deploying StackSet, keeping StackSets (deploy resources) distinct from Account Factory (create accounts).
+
+### 2026-07-14
+
+6.5 done — cross-account sharing and Firewall Manager. Shared an infrastructure resource into the org with RAM (in-org sharing skips invitations, external accounts must accept), drilled RAM (infra) vs resource-based policy (one data resource, two-sided handshake, KMS strictest) vs Service Catalog (self-service with a launch constraint so users deploy without underlying permissions), and mapped Firewall Manager as the org-wide network enforcement orchestrator (four prerequisites, Config the silent one), not the firewall itself.
