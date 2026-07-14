@@ -226,3 +226,7 @@ Repo set up. Starting with Domain 4 (IAM).
 ### 2026-07-14
 
 6.5 done — cross-account sharing and Firewall Manager. Shared an infrastructure resource into the org with RAM (in-org sharing skips invitations, external accounts must accept), drilled RAM (infra) vs resource-based policy (one data resource, two-sided handshake, KMS strictest) vs Service Catalog (self-service with a launch constraint so users deploy without underlying permissions), and mapped Firewall Manager as the org-wide network enforcement orchestrator (four prerequisites, Config the silent one), not the firewall itself.
+
+### 2026-07-14
+
+6.6 done — compliance capstone. Ran the Config detect-and-remediate loop (flagged an unencrypted bucket, auto-fixed it via an SSM document under a remediation role), confirmed Security Hub runs its standards on Config rules and depends on it, and nailed the two exam splits: Config (fix resources) vs Security Hub (score posture on top), and Audit Manager (your evidence, customer side) vs Artifact (AWS's reports, provider side), with the Well-Architected Tool reviewing design not live resources.
