@@ -23,13 +23,12 @@ AWS-Journeys-Edge/
 ├── README.md
 ├── gotchas.md   # running list of exam traps and lab surprises
 ├── cheatsheets/ # one-page mental models per service
-└── domains/
-    ├── 01-detection/
-    ├── 02-incident-response/
-    ├── 03-infrastructure-security/
-    ├── 04-iam/
-    ├── 05-data-protection/
-    └── 06-security-foundations-governance/
+├── 01-detection/
+├── 02-incident-response/
+├── 03-infrastructure-security/
+├── 04-iam/
+├── 05-data-protection/
+└── 06-security-foundations-governance/
 ```
 
 Each domain folder holds one markdown file per subdomain, plus a short README listing that domain's subdomain checklist.
