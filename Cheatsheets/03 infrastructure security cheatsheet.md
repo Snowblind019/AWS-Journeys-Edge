@@ -40,3 +40,42 @@ One-page mental models per service. The recurring spine: stateful vs stateless d
 **DNSSEC and LB TLS:** signing vs validation, security policy vs mTLS.
 - DNSSEC signing is authoritative-side, validation is resolver-side. KSK is an asymmetric ECC_NIST_P256 CMK in us-east-1, and key loss yields SERVFAIL.
 - ALB mTLS verify authenticates client certs at the LB. NLB has no LB-managed mTLS.
+---
+
+## AWS WAF attachment matrix (the single most useful fact here)
+
+Attachable: **CloudFront, Application Load Balancer, API Gateway (REST), AppSync, Cognito user pool, App Runner, Verified Access**.
+
+Not attachable: **EC2 instances, Network Load Balancer, S3 buckets, Route 53**.
+
+Consequences that show up as whole exam questions:
+- Route 53 weighted routing straight to EC2 with an SQLi problem means you must insert an ALB first, then attach the web ACL, then cut the DNS records over, then lock the instance security groups to the ALB.
+- Cognito user pools have **no native geo-blocking setting**. Country filtering for sign-up comes from a WAF web ACL with a geographic match rule associated to the user pool.
+- "Apply a web ACL to the EC2 instances" is always a fabricated step.
+
+## What cannot reach what
+
+- **VPC peering and Transit Gateway cannot reach S3, DynamoDB, or any AWS public service.** They connect VPC to VPC. Private access to a public service is a gateway or interface endpoint, full stop.
+- **A gateway endpoint cannot be reached from on-premises or across Regions.** That is the interface endpoint's job.
+- **Security group referencing works across peered VPCs in the same Region**, and is the correct answer whenever "only some instances need access" plus "instances are created and terminated regularly" appear together. CIDR-based rules always over-grant to the whole range.
+- **CloudHSM is not governed by IAM for crypto operations.** Sharing an HSM cross-account is RAM sharing the **VPC subnet** where the cluster's ENIs live, plus a security group rule for the client IPs. There is no shareable "HSM ID" resource, and IAM roles or STS tokens are distractors.
+- Same shape for **RDS/Aurora, ElastiCache, EFS, Amazon MQ, and Managed Microsoft AD**: the data plane speaks a traditional protocol (SQL, NFS, AMQP, LDAP/Kerberos, PKCS#11), so access is security groups plus the engine's own auth. IAM wraps only the management API. The tell is a non-AWS-native protocol.
+
+## Rate-based vs geographic vs static IP blocking
+
+- Malicious traffic described by **volume or behavior**, and legitimate users must keep working → rate-based rule (per-IP threshold over a rolling window, self-adjusting as attacker IPs rotate).
+- Geo match is correct only when the stem says there are **no legitimate users** in that country, or the company wants the country blocked outright. If the app is global, geo-blocking fails the "do not block legitimate users" clause.
+- Security group deny rules for hundreds of IPs are not a thing (security groups are allow-only) and would not scale anyway.
+
+## Layer 7 DDoS specifics
+
+- "Layer 7 DDoS, CloudFront, automated, no manual effort" → Shield Advanced with **automatic application layer DDoS mitigation enabled**, paired with a rate-based rule. Plain Shield Advanced adds visibility, cost protection, and SRT access, none of which are automated mitigation.
+- CloudWatch alarms and DRT proactive engagement are both human-in-the-loop and lose to any "no manual effort" requirement.
+- Network Firewall is L3/L4 in the VPC and cannot inspect HTTP arriving through CloudFront.
+
+## Question triggers
+
+- "Both accounts, application writes to a bucket in the other account, no public internet" → S3 gateway endpoint in the caller's VPC plus a route table update. Ownership of the bucket is irrelevant to the network path.
+- "Instances churn, only some need database access across a peering connection" → security group referencing.
+- "Certificate-based authentication from on-premises, remove the bastion" → IAM Roles Anywhere.
+- "Stop exfiltration to an outside bucket, keep the job running, no internet egress" → endpoint policy with `aws:PrincipalOrgID` and `aws:ResourceOrgID`.

@@ -22,6 +22,18 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - ABAC principal tags come from user tags or session tags, never a role's own resource tags. Tagging the role does nothing.
 - ABAC collapses if the authorization tag is editable, so pair the allow with a deny on `aws:TagKeys`.
 - Tags are case-sensitive in conditions, and not every service supports `aws:ResourceTag` (S3 objects use `s3:ExistingObjectTag`).
+- The IAM password policy governs native IAM users only. Federated AD users are fixed in Group Policy, Cognito users in the user pool's own password policy, and neither an SCP nor an IAM policy can set password length anywhere.
+- `aws:MultiFactorAuthPresent` describes how the session's credentials were obtained, not whether the user owns a device. An MFA-conditioned policy blocks CLI calls until the user runs `sts get-session-token --serial-number --token-code` and uses the returned temporary credentials.
+- A cross-account role lives in the account that owns the resources. A role in the requesting account is always the wrong shape.
+- A permission set that references a customer managed policy fails to provision unless that policy already exists, with the identical name and permissions, in every target account. AWS managed policies never need this.
+- IAM Identity Center has permission sets, not identity pools, one directory per organization, and a single Region for the instance. "Identity pool" in an option is Cognito vocabulary.
+- SAML federation with an external IdP is a two-way metadata exchange: take Identity Center's metadata to the IdP, then bring the IdP's metadata back. SCIM auto-provisioning is a separate optional step, and a trust policy naming "the IdP's API endpoint" is OIDC workload federation, not workforce SAML.
+- Delegating Identity Center administration means locking the management account down: least-privilege access, permission sets only for the management account, assignments only for the management account.
+- Cross-account assume failures are always trust policy or `ExternalId`, the caller's `sts:AssumeRole` permission, or the role ARN. Password and secret-key options are distractors because `AssumeRole` runs on top of already-valid credentials.
+- IAM Access Analyzer does not trace credential usage. External analyzers find outside exposure, internal analyzers answer which in-account principals can reach a resource, and forensic "what did this key do" is CloudTrail or the credential report's `access_key_last_used_*` fields.
+- KMS grants and STS are not competitors. A grant delegates specific key operations and persists until revoked; `AssumeRole` hands over a whole role for a bounded session. Grants are what AWS services use to act on your key.
+- Cognito custom validation at sign-up is the pre sign-up Lambda trigger. Geographic filtering for a user pool comes from an associated WAF web ACL, because the user pool has no native geo setting.
+- "External users, minimize user database management" is Cognito. "Workforce, many accounts, SAML" is Identity Center. A DynamoDB table of user credentials is the trap in the first case.
 
 ---
 
@@ -50,6 +62,17 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - ETag is not an integrity hash for multipart or SSE-KMS objects. Use the checksum fields.
 - Macie is S3-only. Automated discovery samples (cheap, continuous), jobs scan exhaustively (audit), and a score of 0 is not "clean".
 - ACM: the CloudFront cert must be in us-east-1, the ALB/NLB cert in the LB's Region. Imported and email-validated certs do not auto-renew, DNS validation does.
+- Separation of duties between a bucket team and a key team requires customer managed SSE-KMS. SSE-S3 has no key policy for the security team to own, so it can never split the duty.
+- SSE-C keys are supplied per request and never stored by AWS. "Store the customer-provided keys in KMS" is a fabricated workflow.
+- DSSE-KMS is dual-layer encryption for regulatory dual-encryption requirements, same key management model as SSE-KMS.
+- AWS managed keys cannot be shared or replicated across Regions. Multi-Region keys are a customer-managed-key feature, and they are what pairs with Secrets Manager cross-Region replication.
+- "Must work if only one Region is available" kills any design where the second Region calls back to the first Region's endpoint.
+- Governance mode always has a bypass for a sufficiently privileged principal, including AWS Backup Vault Lock in governance mode. "Even administrators cannot delete" is compliance mode, every time.
+- Object Lock configuration and retention metadata replicate with S3 Replication, so locking the source protects the replicas.
+- Versioning alone does not stop a deliberate permanent delete of a specific version, and a bucket policy is not immutability because a privileged principal can edit it.
+- Immutable audit evidence means S3 Object Lock. CloudWatch Logs and DynamoDB have no WORM equivalent. To capture a resource's creation and origin, the trail and event selector must exist before the resource does.
+- A presigned URL cannot outlive the credentials that signed it. Instance profile credentials rotate on AWS's schedule, so a URL that must stay valid for a full hour should be signed with credentials from an explicit `AssumeRole` call.
+- S3 object access detail with identity and timestamp, structured and near real time, is CloudTrail data events. Server access logging is best-effort, hours-delayed, and flat text.
 
 ---
 
@@ -74,6 +97,16 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - Direct Connect is private but not encrypted. MACsec is L2 link encryption (dedicated-only at 10/100/400G, link not journey), IPsec VPN over DX is L3 end-to-end (~1.25 Gbps per tunnel), and every Site-to-Site VPN has two tunnels.
 - DNSSEC signing is authoritative-side, validation is resolver-side. The KSK is backed by an asymmetric ECC_NIST_P256 CMK in us-east-1, KMS key loss yields SERVFAIL, and you disable by removing the DS record first.
 - ALB mTLS verify authenticates client certs at the load balancer. NLB has no LB-managed mTLS.
+- WAF attaches to CloudFront, ALB, API Gateway, AppSync, Cognito user pools, App Runner, and Verified Access. Never to EC2, NLB, S3, or Route 53. Route 53 pointing straight at EC2 means inserting an ALB before WAF is possible at all.
+- VPC peering and Transit Gateway cannot reach S3 or DynamoDB, because those are not in a VPC. Private access to an AWS public service is always an endpoint.
+- Security group referencing works across peered VPCs in the same Region and is the answer whenever instances churn and only some of them need access. CIDR rules over-grant to the whole range.
+- CloudHSM crypto access is network-layer: RAM-share the subnet holding the cluster ENIs and open the security group to the client IPs. There is no shareable HSM ID, and IAM or STS options are distractors.
+- The same pattern covers RDS, ElastiCache, EFS, Amazon MQ, and Managed Microsoft AD: a traditional protocol on the data plane means security groups plus the engine's own auth, with IAM wrapping only the management API.
+- Rate-based rules target behavior and preserve legitimate users. Geo match is correct only when the stem says there are no legitimate users in that country. Security groups are allow-only, so "deny rules for hundreds of IPs" is not a thing.
+- "Layer 7 DDoS, automated, no manual effort" is Shield Advanced with automatic application layer DDoS mitigation enabled, plus a rate-based rule. CloudWatch alarms and SRT engagement are both human-in-the-loop.
+- A security group change cannot sever an established connection; connection tracking keeps the flow alive. Only a stateless NACL deny drops packets in an existing session, and it hits the whole subnet.
+- With no internet egress, the S3 gateway endpoint policy is the one chokepoint every caller must pass, including an attacker's own credentials. `aws:PrincipalOrgID` plus `aws:ResourceOrgID` there stops exfiltration that an instance-profile policy or an SCP cannot touch.
+- EC2 Instance Connect validates a published host key. Rotating host keys manually without re-publishing breaks it, and the fix is publishing the new key, not creating a new SSH key pair (client auth) or attaching `AmazonSSMManagedInstanceCore` (a different service).
 
 ---
 
@@ -96,6 +129,19 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - CloudWatch data protection masks PII at ingest (before storage), revealed only with `logs:Unmask`, account vs log-group scope, and it is mask-at-ingest vs Macie's scan-at-rest.
 - Security Lake normalizes to OCSF. Query access (SQL) vs data access (SQS plus your own code), Athena (one-off, partition on time) vs OpenSearch (frequent, low-latency). OCSF is Security Lake, ASFF is Security Hub CSPM.
 - Logging silent failures: API Gateway's account-level role, Lambda's execution role `logs:` perms, CloudFront latency and destination, Route 53's us-east-1 and resource policy, Flow Logs' delivery role or bucket policy. Flow Logs never capture Amazon DNS resolver, DHCP, metadata, or Windows activation.
+- GuardDuty DNS findings require the Amazon-provided VPC resolver. A DHCP option set pointing at OpenDNS or any external resolver silently produces no DNS findings at all, which is the classic failed control test.
+- GuardDuty IP lists are plaintext (one IPv4 or CIDR per line) or a threat-intel format, hosted in S3 and referenced by GuardDuty. There is no direct upload, no console paste, and the list file is not JSON even though the API request body is.
+- GuardDuty cannot block anything and cannot invoke Lambda directly. Every automated response goes through EventBridge.
+- Inspector covers EC2, ECR images, and Lambda. It cannot scan S3 for sensitive data and cannot assess an IAM role.
+- Trusted Advisor is not a findings destination. Nothing publishes into it.
+- CloudWatch alarms fire on metric thresholds and cannot match a named API event like `StopLogging`. Event pattern matching is EventBridge.
+- WAF logs never flow through CloudTrail. WAF logging is set on the web ACL to S3, CloudWatch Logs, or Firehose, and partition projection is an Athena-only concept.
+- Match the query engine to the data source: Athena on the S3 trail bucket, Logs Insights on CloudWatch Logs, CloudTrail Lake SQL on an event data store. If the stem says an event data store exists, the other two are distractors.
+- CloudTrail Insights baselines API call rates and flags anomalous volume (a spike in deletes by a privileged user). A metric filter is fixed-threshold counting, not baselining.
+- Detection rules over ingested logs with alerting to SNS is OpenSearch Service Security Analytics. A CloudWatch subscription filter cannot deliver straight to SNS without a Lambda hop.
+- Config consolidates rapid successive changes into the latest configuration item. CloudTrail logs every individual call, so "record only the cumulative result" is Config.
+- Earliest detection of unusual spend is Cost Anomaly Detection. Cost Explorer is investigation, trends, and forecasting; Budgets is a planned threshold; any "review the console daily" option loses on speed.
+- Logs on instance storage die with a scale-in. Continuous streaming to CloudWatch Logs survives it; any daily or scheduled copy leaves a loss window.
 
 ---
 
@@ -118,6 +164,16 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - A root-deny SCP breaks `sts:AssumeRoot`. Task-scoped root sessions use the five task policies, and the management account root cannot be centralized.
 - Malware Protection for EC2 is agentless and not continuous (once per 24 hours). The latest backup may be infected, so recover from a verified-clean point (Malware Protection for AWS Backup), and rebuild from a golden AMI.
 - S3 ransomware: encryption at rest is not a defense (SSE-C is the weapon). Immutability (Object Lock COMPLIANCE), versioning, and MFA Delete are the survival controls, and you revoke access before restoring.
+- Session revocation is evaluated on every API call, not once at issuance, so exfiltrated credentials fail on next use. The residual risk is the attacker re-assuming the role, which is an argument for fixing the instance too, not for skipping revocation.
+- The default credential provider chain describes how an SDK on a machine finds credentials. It is irrelevant to an attacker replaying stolen key, secret, and session token values from their own infrastructure.
+- Quarantining the instance does not touch credentials already exfiltrated. A blanket bucket deny does stop the attacker, at the cost of every legitimate consumer.
+- An SCP cannot reach principals from an account outside your organization, which is why stolen external credentials need a network-layer or resource-side control.
+- Security Hub custom actions are wired in order: create the action (which mints the ARN), build the EventBridge rule on that ARN targeting Lambda, then invoke it from the finding type the function actually acts on.
+- Check backup cadence against the stated RPO first. Daily backups fail a 1-hour RPO and 4-hour snapshots fail it too, regardless of how good the rest of the option looks.
+- Continuous replication of physical and virtual servers with a tight RTO is Elastic Disaster Recovery. AMIs are point-in-time, and AWS Backup is scheduled recovery points; neither is continuous.
+- A complete DR answer covers both data (backups at RPO cadence) and infrastructure (templates in source control). An option with only one is incomplete.
+- Compromised access managed through Identity Center is disabled in Identity Center, not by disabling an IAM user in the management account or stripping permission sets one at a time.
+- For an exposed long-term key, prevention is deactivation and investigation is CloudTrail or the credential report's last-used fields. Access Analyzer does not do usage forensics and GuardDuty has no blocking rule.
 
 ---
 
@@ -133,3 +189,13 @@ Running list of exam traps and lab surprises, by domain. Each line is the sharp 
 - RAM shares infrastructure (in-org sharing skips invitations, external accounts must accept). A resource-based policy grants one data resource (two-sided). Service Catalog is self-service where a launch constraint lets users deploy without underlying permissions. Firewall Manager is the orchestrator not the firewall, and Config is its silent prerequisite.
 - Config vs Security Hub (Security Hub depends on Config). Audit Manager is your evidence (customer side), Artifact is AWS's reports (provider side). The Well-Architected Tool reviews design, not live resources.
 - A tag policy governs shape (value and case, never presence). An SCP with `aws:RequestTag` and a `Null` condition governs presence. `aws:RequestTag` is the tag in the request, `aws:ResourceTag` is the tag on the resource. Deny-based require-tag SCPs break create-then-tag services (Secrets Manager). A tag is only a control when a policy reads it.
+- An SCP can only evaluate condition keys present in the request context. There is no key for the CIDR and port nested inside `IpPermissions`, so "prevent security group rules that open 22 to 0.0.0.0/0" is a detect-and-remediate question despite the word prevent.
+- "Existing and future resources" always needs remediation alongside prevention, because an SCP cannot act on anything that already exists.
+- Config solution shapes map one to one: conformance packs bundle rules for org-wide deployment, an aggregator centralizes compliance data for viewing, Config rules evaluate, Systems Manager remediates, User Notifications alerts.
+- An aggregator scoped to "the accounts and Regions we currently use" silently stops covering anything added later. Organization-wide is the requirement whenever growth is implied.
+- Audit Manager collects your evidence from CloudTrail, Config, and Security Hub against a framework. Artifact hands you AWS's own SOC, PCI, and ISO reports. Do not swap them.
+- The Well-Architected Tool is the answer when the requirement is to improve and evidence resilience, because it reviews architecture against the Reliability pillar. Inspector scans for vulnerabilities and Audit Manager gathers compliance evidence; neither improves the design.
+- Watch environment scope in the stem. FIS is the right category for resilience testing, but experiments run in a development account do not satisfy a requirement scoped to production workloads.
+- Firewall Manager auto-applies a WAF, Shield, or Network Firewall policy to existing and future resources org-wide from a single policy. Config remediation, Service Catalog products, and custom Security Hub to Lambda pipelines are all detect-then-fix with a window of exposure.
+- Centrally granting access to an AWS managed application (Q Developer, QuickSight, SageMaker Studio) is IAM Identity Center as an organization instance.
+- When an SCP is the suspect, the first step is still CloudTrail evidence showing the denied action and the source of the denial. Removing SCPs or copying another OU's SCPs to test the theory are live security-lowering changes made before the cause is known.

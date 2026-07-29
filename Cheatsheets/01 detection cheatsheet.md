@@ -44,3 +44,39 @@ One-page mental models per service. The recurring spine: every default is a trap
 **Service logging failures:** the resource exists but cannot write.
 - API Gateway account-level role, Lambda execution role `logs:` perms, CloudFront latency and destination, Route 53 us-east-1 plus resource policy, Flow Logs delivery role or bucket policy.
 - Flow Logs never capture Amazon DNS resolver, DHCP, metadata, or Windows activation.
+---
+
+## What each service cannot do
+
+- **GuardDuty** cannot block, quarantine, or remediate anything. It emits findings only, and every automated response runs through EventBridge. There is no "GuardDuty rule" that blocks an IP or an access key.
+- **GuardDuty DNS findings** cannot fire if the VPC DHCP option set points at a custom resolver (OpenDNS, Google, on-prem). Those queries never touch the Amazon-provided resolver, so there is no log to analyze, and the control test silently produces nothing.
+- **GuardDuty IP lists** are not JSON. Plaintext (one IPv4 or CIDR per line) or a threat-intel format (STIX, OTX_CSV, ALIEN_VAULT, PROOF_POINT, FIRE_EYE). The file must live in S3 first; there is no direct upload and no paste-in-console path. The API request body is JSON, the list file is not.
+- **Inspector** cannot scan S3 buckets, IAM roles, or data. It covers EC2, container images in ECR, and Lambda, for CVEs and network reachability. "Run an Inspector assessment on an IAM role" is not a real operation.
+- **Macie** cannot log or track object access. It classifies content at rest in S3 only, and it has no Trusted Advisor integration.
+- **Config** cannot detect behavior. It sees configuration state, so "unusual API volume", "malicious activity", or "who accessed this object" are all outside it.
+- **Detective** cannot prevent or remediate. It correlates and visualizes for scoping, and it depends on GuardDuty being enabled.
+- **Trusted Advisor** is not a findings destination. Nothing publishes into it.
+- **CloudWatch alarms** cannot pattern-match a named API event. Alarms fire on metric thresholds; matching `StopLogging` or a finding type by name is EventBridge's job.
+- **CloudTrail** does not carry WAF traffic logs, S3 object access by default, or any service's data-plane records unless data events are explicitly enabled.
+
+## Log source to query engine (the pairing that gets swapped)
+
+- Trail to **S3** → Athena (partition projection for date-partitioned prefixes, no crawler needed).
+- Trail to **CloudWatch Logs** → Logs Insights, metric filters, subscription filters.
+- Organizational **event data store** (CloudTrail Lake) → CloudTrail's own SQL query. This is the tell: if the scenario says an event data store exists, Athena and Logs Insights are both distractors.
+- **WAF logs** go to S3, CloudWatch Logs, or Firehose, chosen on the web ACL. Never through CloudTrail.
+- **S3 access detail** with identity plus timestamp, structured and near real time → CloudTrail data events. S3 server access logging is best-effort, delayed by hours, and flat text.
+- **API Gateway access patterns**, least effort → stage access logging plus Logs Insights. S3 plus Athena is the higher-setup answer, correct only when retention or SQL joins are emphasized.
+- **API call rate anomalies** (unusual volume of deletes, spike in a principal's activity) → CloudTrail Insights, which baselines automatically. A metric filter is fixed-threshold counting, not baselining.
+- **Detection rules over ingested logs with alerting to SNS** → OpenSearch Service Security Analytics.
+
+## Question triggers
+
+- "Suspicious or malicious activity, across the org, centrally" → GuardDuty with a delegated administrator in the security account, findings to EventBridge to SNS.
+- "Inventory of sensitive data across accounts, visible in one place" → Macie delegated admin publishing to Security Hub.
+- "Turn CloudTrail back on automatically if it is disabled" → Config managed rule plus `AWS-EnableCloudTrail` remediation.
+- "Record only the latest configuration after several rapid changes" → Config (configuration items consolidate), not CloudTrail's per-call log.
+- "Correlate findings from multiple detection services to see a multi-stage attack" → Security Hub custom insights.
+- "Investigate one principal or resource, root cause, indicators of compromise" → Detective.
+- "Earliest detection of a cost increase" → Cost Anomaly Detection (ML baseline, pushes to SNS). Cost Explorer is investigation and forecasting, Budgets is a planned-threshold alert, and any "review daily" option loses on speed.
+- "Logs lost when the Auto Scaling group scales in" → CloudWatch agent in the AMI streaming continuously. Any periodic copy job leaves a loss window.

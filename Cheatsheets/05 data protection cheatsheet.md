@@ -36,3 +36,37 @@ One-page mental models per service. The recurring spine: the key policy behaves 
 **Macie and ACM:** Macie finds PII in S3, ACM manages certs.
 - Macie is S3-only, automated discovery samples (cheap), jobs scan exhaustively (audit).
 - CloudFront cert must be in us-east-1, ALB/NLB in the LB's Region. DNS validation auto-renews, imported and email-validated certs do not.
+---
+
+## The SSE grid (separation of duties lives here)
+
+| Mode | Who holds the key | Customer-controlled key policy | Use when |
+|---|---|---|---|
+| SSE-S3 | AWS, invisible | No | Simplicity, no key-access control needed |
+| SSE-KMS, AWS managed (`aws/s3`) | AWS, in KMS | No custom policy | KMS audit trail without key ownership |
+| SSE-KMS, customer managed | You | Yes | **Separation of duties**, rotation control, revocation by disabling the key |
+| DSSE-KMS | You | Yes | Regulatory dual-layer encryption |
+| SSE-C | You, never stored by AWS | N/A | Zero AWS key storage; lose it and the object is unreadable |
+
+- **Separation of duties is the signature phrase for customer managed SSE-KMS.** Operations owns the bucket policy, security owns the key policy, and neither alone can hand out plaintext because decrypt requires permission on both sides.
+- SSE-S3 has no key policy, so it can never satisfy a two-team split.
+- SSE-C keys are supplied per request over HTTPS and are not stored in KMS. "Store the customer-provided keys in KMS" is a fabricated workflow.
+- Cost and throughput caveat for SSE-KMS: every encrypt and decrypt is a KMS API call with request quotas and per-request cost.
+
+## Cross-Region and immutability
+
+- **AWS managed keys cannot be shared or replicated across Regions.** Only customer managed keys support multi-Region keys (shared material and key ID, independent policies). Secrets Manager cross-Region secret replication pairs with a multi-Region CMK.
+- "Must work if only one Region is available" rules out any design where the second Region calls back to the first Region's endpoint. Each Region needs a locally usable copy.
+- **Compliance mode** blocks deletion by everyone including the account root, cannot be shortened, and has no bypass. **Governance mode** always has an override for a principal with the right permission (`s3:BypassGovernanceRetention`, or removing an AWS Backup vault lock). Any requirement phrased as "administrators cannot delete this" means compliance mode.
+- Object Lock configuration and retention metadata **replicate with S3 Replication**, so locking the source protects the destination copies too.
+- S3 versioning alone does not stop a deliberate permanent delete of a specific version, and a bucket policy is not a hard immutability guarantee because a sufficiently privileged principal can edit it.
+- **Immutable compliance evidence** always means S3 Object Lock. CloudWatch Logs and DynamoDB have no WORM equivalent. Sequencing matters too: to capture a resource's creation and origin, the trail and event selector must exist **before** the resource is created.
+
+## Question triggers
+
+- "Two teams, one owns buckets, one owns keys, a mistake by either must not expose plaintext" → SSE-KMS with a customer managed key, bucket policy from ops, key policy from security.
+- "Temporary, occasional access to a key for a software process, least overhead" → KMS grant, revoked afterward. Editing the key policy each cycle is the more manual distractor.
+- "Object-level access detail with identity and timestamp, structured, near real time" → CloudTrail data events, not S3 server access logging.
+- "Replicate secrets to a second Region, minimize latency, survive one Region being down" → customer managed multi-Region KMS key plus Secrets Manager replication.
+- "Protect from permanent deletion even by admins, plus cross-Region DR" → Object Lock in compliance mode on the source, replication to the second Region.
+- "Presigned URLs must be valid for the full hour" → sign with credentials from an explicit `AssumeRole` call, because a presigned URL dies with the session that signed it, and instance profile credentials rotate on AWS's schedule, not yours.
