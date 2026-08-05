@@ -1,8 +1,13 @@
 # AWS Journeys Edge
 
+![Coverage](https://img.shields.io/badge/Coverage-All%206%20Domains-brightgreen)
+![Exam](https://img.shields.io/badge/SCS--C03-Passed%20Aug%202026-success)
+
 Hands-on lab series for the **AWS Certified Security Specialty (SCS-C03)**. Every domain and subdomain of the blueprint built out by hand in a real AWS account, then documented. This is a working repository, not a polished course. Notes are written to be technically correct and useful for review, not to look good.
 
-Companion to my main repo, **[AWS Security Specialty: The Long Road](https://github.com/Snowblind019/AWS-Security-Specialty-The-Long-Road)**.
+**I passed the SCS-C03 on August 4, 2026, on the fourth attempt.** The first three were studied rather than built. This repo is what the fourth one was built on, so if you are deciding whether the method below is worth the time: it is what worked, and nothing before it did.
+
+Companion to my main repo, **[AWS Security Specialty: The Long Road](https://github.com/Snowblind019/AWS-Security-Specialty-The-Long-Road)**, which covers the full path and what each failed attempt taught me.
 
 ## The method
 
